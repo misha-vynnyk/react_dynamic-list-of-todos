@@ -13,8 +13,19 @@ import { Loader } from './components/Loader';
 import { Todo } from './types/Todo';
 // #endregion import
 
+export enum Filter {
+  all = 'all',
+  active = 'active',
+  completed = 'completed',
+}
+
+export const filterLabels: { [key in Filter]: string } = {
+  [Filter.all]: 'All',
+  [Filter.active]: 'Active',
+  [Filter.completed]: 'Completed',
+};
+
 export const App: React.FC = () => {
-  // #region State
   const [todos, setTodos] = useState<Todo[]>([]);
   const [currentTodo, setCurrentTodo] = useState<Todo | null>(null);
 
@@ -24,19 +35,14 @@ export const App: React.FC = () => {
   const [todosLoading, setTodosLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
 
-  const [filterValue, setFilterValue] = useState('');
+  const [filterValue, setFilterValue] = useState<Filter>(Filter.all);
   const [searchTerm, setSearchTerm] = useState('');
-
-  // eslint-disable-next-line no-console
-  console.log('Render');
 
   useEffect(() => {
     setTodosLoading(true);
 
     getTodos()
-      .then(data => {
-        setTodos(data);
-      })
+      .then(setTodos)
       .finally(() => setTodosLoading(false));
   }, []);
 
@@ -56,14 +62,7 @@ export const App: React.FC = () => {
         });
       })
       .finally(() => setModalLoading(false));
-
-    // // eslint-disable-next-line no-console
-    // console.log('Modal state:', isModalOpen, 'ModalLoader:', modalLoading);
   }, [currentTodo]);
-
-  // #endregion State
-
-  // #region Handler
 
   const handleOpenModal = (todo: Todo): void => {
     setOpenTodoId(todo.id);
@@ -76,13 +75,15 @@ export const App: React.FC = () => {
   const filteredAndSearchedTodos = useMemo(() => {
     return todos
       .filter(todo => {
-        if (filterValue === 'completed') {
-          return todo.completed === true;
-        } else if (filterValue === 'active') {
-          return todo.completed === false;
+        switch (filterValue) {
+          case Filter.completed:
+            return todo.completed;
+          case Filter.active:
+            return !todo.completed;
+          case Filter.all:
+          default:
+            return true;
         }
-
-        return true;
       })
       .filter(todo => {
         return todo.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -102,7 +103,6 @@ export const App: React.FC = () => {
     setSearchTerm('');
   };
 
-  // #endregion Handler
   return (
     <>
       <div className="section">

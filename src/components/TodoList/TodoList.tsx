@@ -27,50 +27,55 @@ export const TodoList: React.FC<Props> = React.memo(
         </thead>
 
         <tbody>
-          {todos.map(todo => {
-            return (
-              <tr data-cy="todo" className="" key={todo.id}>
-                <td className="is-vcentered">{todo.id}</td>
-                {todo.completed ? (
-                  <td className="is-vcentered">
-                    <span className="icon" data-cy="iconCompleted">
-                      <i className="fas fa-check" />
-                    </span>
-                  </td>
-                ) : (
-                  <td className="is-vcentered" />
-                )}
-                <td className="is-vcentered is-expanded">
-                  <p
-                    className={classNames({
-                      'has-text-success': todo.completed,
-                      'has-text-danger': !todo.completed,
-                    })}
-                  >
-                    {todo.title}
-                  </p>
+          {todos.map(({ id, completed, title, userId }) => (
+            <tr data-cy="todo" key={id}>
+              <td className="is-vcentered">{id}</td>
+              {completed ? (
+                <td className="is-vcentered">
+                  <span className="icon" data-cy="iconCompleted">
+                    <i className="fas fa-check" />
+                  </span>
                 </td>
-                <td className="has-text-right is-vcentered">
-                  <button
-                    data-cy="selectButton"
-                    className="button"
-                    type="button"
-                    aria-label="Open modal"
-                    onClick={() => handleOpenModal(todo)}
-                  >
-                    <span className="icon">
-                      <i
-                        className={classNames('far', {
-                          'fa-eye-slash': openTodoId === todo.id && isModalOpen,
-                          'fa-eye': !(openTodoId === todo.id && isModalOpen),
-                        })}
-                      />
-                    </span>
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
+              ) : (
+                <td className="is-vcentered" />
+              )}
+              <td className="is-vcentered is-expanded">
+                <p
+                  className={classNames({
+                    'has-text-success': completed,
+                    'has-text-danger': !completed,
+                  })}
+                >
+                  {title}
+                </p>
+              </td>
+              <td className="has-text-right is-vcentered">
+                <button
+                  data-cy="selectButton"
+                  className="button"
+                  type="button"
+                  aria-label={`Open modal for todo ${id}`}
+                  onClick={() =>
+                    handleOpenModal({
+                      id,
+                      completed,
+                      title,
+                      userId,
+                    })
+                  }
+                >
+                  <span className="icon">
+                    <i
+                      className={classNames('far', {
+                        'fa-eye-slash': openTodoId === id && isModalOpen,
+                        'fa-eye': !(openTodoId === id && isModalOpen),
+                      })}
+                    />
+                  </span>
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     );

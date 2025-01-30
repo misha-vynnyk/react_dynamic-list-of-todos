@@ -1,5 +1,7 @@
+import { Filter, filterLabels } from '../../App';
+
 interface Props {
-  setFilterValue: React.Dispatch<React.SetStateAction<string>>;
+  setFilterValue: React.Dispatch<React.SetStateAction<Filter>>;
   searchTerm: string;
   handleSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleClearSearch: () => void;
@@ -17,11 +19,13 @@ export const TodoFilter: React.FC<Props> = ({
         <span className="select">
           <select
             data-cy="statusSelect"
-            onChange={event => setFilterValue(event.target.value)}
+            onChange={event => setFilterValue(event.target.value as Filter)}
           >
-            <option value="all">All</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
+            {Object.values(Filter).map(filter => (
+              <option key={filter} value={filter}>
+                {filterLabels[filter]}
+              </option>
+            ))}
           </select>
         </span>
       </p>
@@ -40,10 +44,9 @@ export const TodoFilter: React.FC<Props> = ({
         </span>
 
         <span className="icon is-right" style={{ pointerEvents: 'all' }}>
-          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-
           {searchTerm && (
             <button
+              aria-label="Clear search input"
               data-cy="clearSearchButton"
               type="button"
               className="delete"
